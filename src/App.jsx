@@ -7,7 +7,7 @@ function App() {
 
       <div className="space-y-4 w-full max-w-xs">
         <a
-          href="https://t.me/yourtelegram"
+          href="https://t.me/Technovaitacademy"
           className="block w-full text-center bg-[#383C45] text-white py-3 rounded-xl text-lg font-semibold shadow-lg hover:bg-[#D42322] transition"
           target="_blank"
           rel="noopener noreferrer"
@@ -15,7 +15,7 @@ function App() {
           Telegram
         </a>
         <a
-          href="https://instagram.com/yourinstagram"
+          href="https://www.instagram.com/technova_it.academy"
           className="block w-full text-center bg-[#383C45] text-white py-3 rounded-xl text-lg font-semibold shadow-lg hover:bg-[#D42322] transition"
           target="_blank"
           rel="noopener noreferrer"
@@ -26,7 +26,7 @@ function App() {
           href="tel:+123456789"
           className="block w-full text-center bg-[#383C45] text-white py-3 rounded-xl text-lg font-semibold shadow-lg hover:bg-[#D42322] transition"
         >
-          Call Us: +123 456 789
+          tel: +998 94 092 7272
         </a>
       </div>
 
