@@ -246,7 +246,7 @@ export default function Home() {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}
-        className="py-20 px-6 text-center bg-gradient-to-b from-[#0c0c0c] to-black"
+        className="pt-20 pb-14 px-6 text-center bg-gradient-to-b from-[#0c0c0c] to-black"
       >
         <h2 className="text-3xl md:text-5xl font-bold text-[#14B217] mb-6 neon-text">
           Yaxshi IT kelajakni Technova bilan boshlang
@@ -265,6 +265,19 @@ export default function Home() {
         </motion.button>
       </motion.section>
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <div className="flex justify-end items-center p-2 w-full">
+        <a
+          href="https://www.techgigs.uz"
+          className="text-[#D8FADB] text-end flex  justify-center items-center gap-3"
+        >
+          created by
+          <img
+            src="/logo-white-word.webp"
+            alt="techgigs logo"
+            className="h-[30px] object-contain"
+          />
+        </a>
+      </div>
     </div>
   );
 }
