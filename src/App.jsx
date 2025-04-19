@@ -190,7 +190,7 @@ export default function Home() {
         className="bg-[#020202] pt-16 pb-14 text-center"
       >
         <h3 className="text-2xl md:text-4xl text-[#D8FADB] mb-6 font-semibold neon-text">
-          Aloqa Ma'lumotlari
+          Aloqa Ma&apos;lumotlari
         </h3>
         <div className="flex flex-wrap justify-center gap-6">
           {[
