@@ -83,13 +83,18 @@ export default function Home() {
         <h3 className="text-xl text-[#D8FADB] mb-4 neon-text">
           Chegirmalarga oxirgi muddat:
         </h3>
-        <div className="flex justify-center gap-4 text-3xl md:text-5xl font-bold">
-          {["03", "15", "42"].map((val, i) => (
-            <div key={i}>
-              <div className="bg-[#10B314]/20 px-4 py-2 rounded neon-glow animate-pulse">
+        <div className="flex justify-center  text-3xl md:text-5xl font-bold">
+          {["03", ":", "15", ":", "42"].map((val, i) => (
+            <div key={i} className="flex">
+              <div
+                className={
+                  val === ":"
+                    ? "px-4 py-2"
+                    : `bg-[#10B314]/20 px-4 py-2 rounded neon-glow animate-pulse`
+                }
+              >
                 {val}
-              </div>{" "}
-              {i !== 2 && ":"}
+              </div>
             </div>
           ))}
         </div>
