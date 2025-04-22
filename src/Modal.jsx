@@ -1,13 +1,16 @@
+/* eslint-disable react/prop-types */
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 
 export default function Modal({ isOpen, onClose }) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [course, setCourse] = useState("");
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState("success");
+  console.log(import.meta.env.VITE_NOTION_API_KEY);
 
   useEffect(() => {
     if (isOpen) {
@@ -19,9 +22,7 @@ export default function Modal({ isOpen, onClose }) {
       document.body.style.overflow = "";
     };
   }, [isOpen]);
-  useEffect(() => {
-    console.log(errors);
-  }, [errors]);
+
   const validate = () => {
     const newErrors = {};
     if (!name.trim()) {
@@ -35,37 +36,81 @@ export default function Modal({ isOpen, onClose }) {
     if (!phone.trim()) {
       newErrors.phone = "Telefon raqam majburiy";
     } else if (phone.length < 12) {
-      newErrors.phone = "Telefon raqam eng kamida 12 xonalik bolishi kerak";
+      newErrors.phone = "Telefon raqam eng kamida 12 xonalik bo‘lishi kerak";
     } else if (!phone.includes("+")) {
-      newErrors.phone = `Telefon raqamni oldida "+" belgisi bolish kerak`;
+      newErrors.phone = `Telefon raqam boshida "+" belgisi bo‘lishi kerak`;
     } else if (phone.length > 80) {
-      newErrors.phone = `Telefon raqami 80 honalikdan oshmasligi kerak`;
-    }
-
-    if (!course) {
-      newErrors.course = "Kursni tanlang";
+      newErrors.phone = `Telefon raqam 80 belgidan oshmasligi kerak`;
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    try {
+      if (!validate()) return;
 
-    if (validate()) {
       setSubmitting(true);
-      setErrors({});
+
+      const res = await fetch("https://api.notion.com/v1/pages", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${import.meta.env.VITE_NOTION_API_KEY}`,
+          "Content-Type": "application/json",
+          "Notion-Version": "2022-06-28",
+        },
+        body: JSON.stringify({
+          parent: {
+            database_id: import.meta.env.VITE_DATABASE_ID,
+          },
+          properties: {
+            oquvchi_ismi: {
+              title: [
+                {
+                  text: {
+                    content: name,
+                  },
+                },
+              ],
+            },
+            telefon_raqami: {
+              rich_text: [
+                {
+                  text: {
+                    content: phone,
+                  },
+                },
+              ],
+            },
+            Status: {
+              status: {
+                name: "Bog'lanilmagan",
+              },
+            },
+          },
+        }),
+      });
+
+      if (!res.ok) throw new Error("Server error");
+
+      setToastType("success");
+      setToastMessage("Muvaffaqiyatli yuborildi!");
+      setShowToast(true);
+
       setName("");
       setPhone("");
-      setCourse("");
       setErrors({});
       onClose();
+    } catch (err) {
+      console.error(err);
+      setToastType("error");
+      setToastMessage("Xatolik yuz berdi. Iltimos, qaytadan urinib ko‘ring.");
       setShowToast(true);
-      setTimeout(() => {
-        setShowToast(false);
-        setSubmitting(false);
-      }, 1000);
+    } finally {
+      setSubmitting(false);
+      setTimeout(() => setShowToast(false), 4000);
     }
   };
 
@@ -86,7 +131,7 @@ export default function Modal({ isOpen, onClose }) {
             transition={{ duration: 0.3, ease: "easeOut" }}
           >
             <button
-              className="absolute top-4 right-4 text-[#fefefe] text-xl"
+              className="absolute top-4 right-4 text-2xl text-[#fefefe] hover:text-red-500"
               onClick={onClose}
             >
               ×
@@ -96,9 +141,7 @@ export default function Modal({ isOpen, onClose }) {
             </h2>
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
-                <label className="block mb-1 text-sm text-[#fefefe]">
-                  Ism va familiya
-                </label>
+                <label className="block mb-1 text-sm">Ism va familiya</label>
                 <input
                   type="text"
                   value={name}
@@ -111,9 +154,7 @@ export default function Modal({ isOpen, onClose }) {
                 )}
               </div>
               <div>
-                <label className="block mb-1 text-sm text-[#fefefe]">
-                  Telefon raqam
-                </label>
+                <label className="block mb-1 text-sm">Telefon raqam</label>
                 <input
                   type="tel"
                   value={phone}
@@ -129,38 +170,15 @@ export default function Modal({ isOpen, onClose }) {
                   <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
                 )}
               </div>
-              <div>
-                <label className="block mb-1 text-sm text-[#fefefe]">
-                  Kurs yo‘nalishi
-                </label>
-                <select
-                  value={course}
-                  onChange={(e) => setCourse(e.target.value)}
-                  className="w-full cursor-pointer p-3 rounded-xl bg-[#1a1a1a] text-white border border-[#14B217]/30 focus:outline-none focus:ring-2 focus:ring-[#14B217]"
-                >
-                  <option value="" disabled>
-                    Kursni tanlang
-                  </option>
-                  <option>Frontend</option>
-                  <option>Backend</option>
-                  <option>IT Foundation</option>
-                  <option>IELTS</option>
-                  <option>General English</option>
-                  <option>Koreys tili</option>
-                  <option>Grafik dizayn</option>
-                  <option>Interyer dizayn</option>
-                  <option>SMM Pro</option>
-                </select>
-                {errors.course && (
-                  <p className="text-red-500 text-sm mt-1">{errors.course}</p>
-                )}
-              </div>
+
               <button
                 type="submit"
                 disabled={submitting}
-                className={`w-full py-3 ${
-                  submitting ? "bg-gray-400" : "bg-[#14B217] hover:bg-[#12a015]"
-                } text-black font-bold rounded-xl shadow-md transition`}
+                className={`w-full py-3 font-bold rounded-xl transition shadow-md ${
+                  submitting
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-[#14B217] hover:bg-[#12a015] cursor-pointer"
+                }`}
               >
                 {submitting ? "Yuborilmoqda..." : "Yuborish"}
               </button>
@@ -168,14 +186,19 @@ export default function Modal({ isOpen, onClose }) {
           </motion.div>
         </motion.div>
       )}
+
       {showToast && (
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 50 }}
-          className="fixed top-6 left-1/2 transform -translate-x-1/2 bg-[#14B217] text-black px-6 py-3 rounded-xl shadow-xl z-50 text-sm font-semibold"
+          className={`fixed top-6 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-xl shadow-xl z-50 text-sm font-semibold ${
+            toastType === "success"
+              ? "bg-[#14B217] text-black"
+              : "bg-red-500 text-white"
+          }`}
         >
-          Muvaffaqiyatli yuborildi!
+          {toastMessage}
         </motion.div>
       )}
     </AnimatePresence>
