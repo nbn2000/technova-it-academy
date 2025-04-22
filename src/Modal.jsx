@@ -10,7 +10,6 @@ export default function Modal({ isOpen, onClose }) {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [toastType, setToastType] = useState("success");
-  console.log(import.meta.env.VITE_NOTION_API_KEY);
 
   useEffect(() => {
     if (isOpen) {
@@ -49,49 +48,21 @@ export default function Modal({ isOpen, onClose }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      if (!validate()) return;
+    if (!validate()) return;
 
+    try {
       setSubmitting(true);
 
-      const res = await fetch("https://api.notion.com/v1/pages", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${import.meta.env.VITE_NOTION_API_KEY}`,
-          "Content-Type": "application/json",
-          "Notion-Version": "2022-06-28",
-        },
-        body: JSON.stringify({
-          parent: {
-            database_id: import.meta.env.VITE_DATABASE_ID,
+      const res = await fetch(
+        "https://technova-it-academy-api.vercel.app/submit",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-          properties: {
-            oquvchi_ismi: {
-              title: [
-                {
-                  text: {
-                    content: name,
-                  },
-                },
-              ],
-            },
-            telefon_raqami: {
-              rich_text: [
-                {
-                  text: {
-                    content: phone,
-                  },
-                },
-              ],
-            },
-            Status: {
-              status: {
-                name: "Bog'lanilmagan",
-              },
-            },
-          },
-        }),
-      });
+          body: JSON.stringify({ name, phone }),
+        }
+      );
 
       if (!res.ok) throw new Error("Server error");
 
